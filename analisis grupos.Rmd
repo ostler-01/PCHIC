@@ -1,0 +1,172 @@
+---
+title: "ANALISIS MATRICEZ DE NIVEL"
+author: "oscar lazo"
+date: "2024-06-25"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+library(readr)
+library(psych)
+library(ggplot2)
+library(stargazer)
+library(lmtest)
+library(gridExtra)
+library(PerformanceAnalytics)
+library(car)
+library(corrplot)
+library(knitr)
+
+```
+
+```{r}
+
+data <- read.csv("RESULTADOSNIVELES DE SIMILARIDAD.csv", sep = ";", header = TRUE,stringsAsFactors = FALSE)
+attach(data)
+head(data)
+
+```
+### h
+```{r}
+library(ggplot2)
+a1<-ggplot(data, aes(Porcentaje.de..Clasificacion.similares,Nbase)) + geom_point()+geom_smooth(method=)
+a2<-ggplot(data, aes(Porcentaje.de..Clasificacion.similares,Num.variables)) + geom_point()+geom_smooth(method=)
+grid.arrange(a1,a2)
+```
+
+```{r}
+ggplot(data, aes(Porcentaje.de..Clasificacion.similares,Num.variables)) + geom_point()+geom_smooth(method=)
+```
+
+```{r}
+ggplot(data, aes(Porcentaje.de.Grupos.Similares,Nbase)) + geom_point()+geom_smooth(method=)
+```
+
+
+```{r}
+resumen_psych <- describe(data)
+
+kable(print(resumen_psych))
+```
+
+```{r}
+str(data)
+```
+#contraste
+```{r}
+library(tidyverse)
+```
+```{r}
+Porcentaje.de..Clasificacion.similares<-as.integer(Porcentaje.de..Clasificacion.similares)
+Valores.Clasificacion.RCHIC<-as.integer(Valores.Clasificacion.RCHIC)
+Valores.Clasificacion.PCHIC<-as.integer(Valores.Clasificacion.PCHIC)
+data<-data.frame(Nbase,Num.variables,Grupos.Rchic,Grupos.Pchic,Valores.Clasificacion.RCHIC,Valores.Clasificacion.PCHIC,Porcentaje.de.Grupos.Similares,Porcentaje.de..Clasificacion.similares)
+
+```
+
+```{r}
+promedio<-c(0.99,0.865,0.74);promedio
+t.test(x=promedio, alternative = "greater", mu=0.8 , conf.level = 0.95)
+```
+# analisis descriptivo
+
+
+
+
+```{r}
+
+t.test(x=Porcentaje.de..Clasificacion.similares , alternative = "greater", mu=0.9 , conf.level = 0.95)
+```
+# analisis descriptivo
+
+```{r}
+resumen_psych <- describe(data)
+
+kable(print(resumen_psych))
+```
+### analisis grafico
+```{r}
+A<-ggplot(data,aes(x=Grupos.Rchic))+
+geom_histogram(bins=10,aes(y = ..density..),fill="gray", color = "black", size=0.1)+
+geom_density(col="blue")+
+stat_function(fun=dnorm,color="red",args = list( mean(Grupos.Rchic),sd(Grupos.Rchic)),size=0.7)+
+labs(title=" Distribución de grupos  formados por Rchic ", y="Densidad",x="rchic")
+
+B<-ggplot(data,aes(x=Grupos.Pchic))+
+geom_histogram(bins=10,aes(y = ..density..),fill="gray", color = "black", size=0.1)+
+geom_density(col="blue")+
+stat_function(fun=dnorm,color="red",args = list( mean(Grupos.Pchic),sd(Grupos.Pchic)),size=0.7)+
+labs(title=" Distribución de grupos  formados por  Pchic ", y="Densidad",x="Pchic")
+
+grid.arrange(A,B)
+
+
+```
+### DISTRIBUCION CONJUNTA 
+
+
+```{r}
+x1 <- Grupos.Rchic
+x2 <- Grupos.Pchic
+x <- c(x1, x2)
+ Grupo <- c(rep("RCHIC", length(Grupos.Rchic)), rep("PCHIC", length(Grupos.Pchic)))
+
+df <- data.frame(x, group = Grupo)
+
+ggplot(df)+
+  aes(x=x,fill=Grupo)+
+  geom_histogram(aes(y=..density..),bins=50,alpha=0.75,position="identity")+
+  geom_density(aes(linetype=Grupo,colour=Grupo),alpha=0)+
+  labs(title="",x="Representación de grupos  generados por Pchic y Rchic.",y="")+
+  theme_classic()
+
+```
+
+### reprentacion
+
+### analisis grafico
+```{r}
+A<-ggplot(data,aes(x=Valores.Clasificacion.RCHIC))+
+geom_histogram(bins=10,aes(y = ..density..),fill="gray", color = "black", size=0.1)+
+geom_density(col="blue")+
+stat_function(fun=dnorm,color="red",args = list( mean(Valores.Clasificacion.RCHIC),sd(Valores.Clasificacion.RCHIC)),size=0.7)+
+labs(title=" Distribución de valores de clasificación Rchic ", y="Densidad",x="rchic")
+
+B<-ggplot(data,aes(x=Valores.Clasificacion.PCHIC))+
+geom_histogram(bins=10,aes(y = ..density..),fill="gray", color = "black", size=0.1)+
+geom_density(col="blue")+
+stat_function(fun=dnorm,color="red",args = list( mean(Valores.Clasificacion.PCHIC),sd(Valores.Clasificacion.PCHIC)),size=0.7)+
+labs(title=" Distribución de valores de clasificación  Pchic ", y="Densidad",x="Pchic")
+
+grid.arrange(A,B)
+
+
+```
+```{r}
+x1 <- Valores.Clasificacion.RCHIC
+x2 <- Valores.Clasificacion.PCHIC
+x <- c(x1, x2)
+ Grupo <- c(rep("RCHIC", length(Valores.Clasificacion.RCHIC)), rep("PCHIC", length(Valores.Clasificacion.PCHIC)))
+
+df <- data.frame(x, group = Grupo)
+
+ggplot(df)+
+  aes(x=x,fill=Grupo)+
+  geom_histogram(aes(y=..density..),bins=50,alpha=0.75,position="identity")+
+  geom_density(aes(linetype=Grupo,colour=Grupo),alpha=0)+
+  labs(title="",x="Representación de valores generados por Pchic y Rchic.",y="")+
+  theme_classic()
+```
+
+## porcentajes
+
+
